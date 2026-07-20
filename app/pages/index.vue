@@ -42,26 +42,35 @@ const {
   data: articles,
   status,
   error,
-} = await useAsyncData("home-articles", () =>
-  queryCollection("articles").order("publishedAt", "DESC").all(),
+  refresh,
+} = await useAsyncData(
+  "homepage-articles-list",
+  async () => {
+    const result = await queryCollection("articles")
+      .order("publishedAt", "DESC")
+      .all();
+
+    return result ?? [];
+  },
+  {
+    default: () => [],
+  },
 );
 
 const featuredArticle = computed(() => {
   return (
-    articles.value?.find((article) => article.featured) ??
-    articles.value?.[0] ??
+    articles.value.find((article) => article.featured) ??
+    articles.value[0] ??
     null
   );
 });
 
 const latestArticles = computed(() => {
-  const allArticles = articles.value ?? [];
-
   if (selectedCategory.value === "all") {
-    return allArticles;
+    return articles.value;
   }
 
-  return allArticles.filter(
+  return articles.value.filter(
     (article) => article.category === selectedCategory.value,
   );
 });
