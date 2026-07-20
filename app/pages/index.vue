@@ -1,11 +1,12 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "Araz Blog | Frontend Development",
+  title: "Araz Shams | Senior Frontend Engineer",
   description:
-    "Practical articles about React, Angular, Vue, Nuxt, TypeScript and modern frontend development.",
-  ogTitle: "Araz Blog | Frontend Development",
+    "Practical articles about React, Angular, Vue, Nuxt, TypeScript, frontend architecture and modern web development.",
+  ogTitle: "Araz Shams | Senior Frontend Engineer",
   ogDescription:
-    "Practical articles about React, Angular, Vue, Nuxt, TypeScript and modern frontend development.",
+    "Practical articles about React, Angular, Vue, Nuxt, TypeScript, frontend architecture and modern web development.",
+  ogType: "website",
 });
 
 const categories = [
@@ -75,12 +76,22 @@ const latestArticles = computed(() => {
   );
 });
 
-function formatDate(date: string) {
+function formatDate(date?: string) {
+  if (!date) {
+    return "";
+  }
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  }).format(new Date(date));
+  }).format(parsedDate);
 }
 </script>
 
@@ -93,7 +104,7 @@ function formatDate(date: string) {
       />
 
       <div
-        class="absolute left-1/2 top-24 -z-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary/15 blur-[130px]"
+        class="absolute left-1/2 top-24 -z-10 size-[420px] -translate-x-1/2 rounded-full bg-primary/15 blur-[130px]"
       />
 
       <UContainer class="py-20 sm:py-28">
@@ -154,6 +165,7 @@ function formatDate(date: string) {
         </div>
       </UContainer>
     </section>
+
     <!-- Loading -->
     <section v-if="status === 'pending'">
       <UContainer>
@@ -175,7 +187,7 @@ function formatDate(date: string) {
     </section>
 
     <!-- Error -->
-    <section v-else-if="error">
+    <section v-else-if="status === 'error'">
       <UContainer>
         <div
           class="rounded-3xl border border-error/30 bg-error/10 p-8 text-center"
@@ -190,159 +202,192 @@ function formatDate(date: string) {
           </h2>
 
           <p class="mt-2 text-muted">
-            Please check your Nuxt Content configuration.
-          </p>
-        </div>
-      </UContainer>
-    </section>
-
-    <!-- Featured article -->
-    <section v-else-if="featuredArticle">
-      <UContainer>
-        <NuxtLink
-          :to="featuredArticle.path"
-          class="group grid overflow-hidden rounded-3xl border border-default bg-elevated transition hover:border-primary/40 hover:shadow-2xl lg:grid-cols-2"
-        >
-          <!-- Image -->
-          <div class="relative h-80 overflow-hidden lg:h-auto">
-            <img
-              :src="featuredArticle.image"
-              :alt="featuredArticle.title"
-              class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-            />
-
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"
-            />
-
-            <UBadge
-              label="Featured"
-              color="primary"
-              class="absolute left-5 top-5"
-            />
-          </div>
-
-          <!-- Content -->
-          <div class="flex flex-col justify-center p-8 sm:p-12">
-            <UBadge
-              :label="featuredArticle.category"
-              color="neutral"
-              variant="soft"
-              class="w-fit"
-            />
-
-            <h2
-              class="mt-6 text-4xl font-bold text-highlighted transition group-hover:text-primary"
-            >
-              {{ featuredArticle.title }}
-            </h2>
-
-            <p class="mt-5 text-lg leading-8 text-muted">
-              {{ featuredArticle.description }}
-            </p>
-
-            <div class="mt-6 flex items-center gap-3 text-sm text-muted">
-              <span>{{ formatDate(featuredArticle.publishedAt) }}</span>
-
-              <span>•</span>
-
-              <span>{{ featuredArticle.readingTime }} min read</span>
-            </div>
-
-            <div
-              class="mt-8 flex items-center gap-2 font-semibold text-primary"
-            >
-              Read article
-
-              <UIcon
-                name="i-lucide-arrow-right"
-                class="transition group-hover:translate-x-2"
-              />
-            </div>
-          </div>
-        </NuxtLink>
-      </UContainer>
-    </section>
-
-    <!-- Latest articles -->
-    <section class="py-24">
-      <UContainer>
-        <div
-          class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
-        >
-          <div>
-            <p class="font-medium text-primary">Latest articles</p>
-
-            <h2
-              class="mt-2 text-3xl font-bold tracking-tight text-highlighted sm:text-4xl"
-            >
-              Learn something new
-            </h2>
-
-            <p class="mt-3 max-w-xl leading-7 text-muted">
-              Tutorials and insights about frontend development, architecture
-              and modern JavaScript frameworks.
-            </p>
-          </div>
-
-          <UButton
-            label="View all articles"
-            to="/articles"
-            color="neutral"
-            variant="outline"
-            trailing-icon="i-lucide-arrow-right"
-          />
-        </div>
-
-        <!-- Categories -->
-        <div class="mt-8 flex flex-wrap gap-2">
-          <UButton
-            v-for="category in categories"
-            :key="category.value"
-            :label="category.label"
-            :icon="category.icon"
-            :color="selectedCategory === category.value ? 'primary' : 'neutral'"
-            :variant="selectedCategory === category.value ? 'soft' : 'ghost'"
-            @click="selectedCategory = category.value"
-          />
-        </div>
-
-        <!-- Article cards -->
-        <div
-          v-if="latestArticles.length"
-          class="mt-10 grid gap-7 md:grid-cols-2 lg:grid-cols-3"
-        >
-          <BlogArticleCard
-            v-for="article in latestArticles"
-            :key="article.path"
-            :article="article"
-          />
-        </div>
-
-        <!-- Empty category -->
-        <div
-          v-else
-          class="mt-10 rounded-3xl border border-dashed border-default px-6 py-16 text-center"
-        >
-          <UIcon name="i-lucide-files" class="mx-auto size-10 text-muted" />
-
-          <h3 class="mt-4 text-xl font-semibold text-highlighted">
-            No articles found
-          </h3>
-
-          <p class="mt-2 text-muted">
-            There are currently no articles in this category.
+            {{
+              error?.message ||
+              "An unexpected error occurred while loading the articles."
+            }}
           </p>
 
           <UButton
-            label="Show all articles"
+            label="Try again"
+            icon="i-lucide-refresh-cw"
             color="neutral"
             variant="outline"
             class="mt-6"
-            @click="selectedCategory = 'all'"
+            @click="refresh"
           />
         </div>
       </UContainer>
     </section>
+
+    <!-- Successful content -->
+    <template v-else-if="status === 'success'">
+      <!-- Featured article -->
+      <section v-if="featuredArticle">
+        <UContainer>
+          <NuxtLink
+            :to="featuredArticle.path"
+            class="group grid overflow-hidden rounded-3xl border border-default bg-elevated transition duration-300 hover:border-primary/40 hover:shadow-2xl lg:grid-cols-2"
+          >
+            <!-- Image -->
+            <div class="relative h-80 overflow-hidden lg:h-auto">
+              <img
+                v-if="featuredArticle.image"
+                :src="featuredArticle.image"
+                :alt="featuredArticle.title"
+                class="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
+              />
+
+              <div
+                v-else
+                class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 via-primary/10 to-transparent"
+              >
+                <UIcon
+                  :name="featuredArticle.icon || 'i-lucide-file-text'"
+                  class="size-20 text-primary"
+                />
+              </div>
+
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"
+              />
+
+              <UBadge
+                label="Featured"
+                color="primary"
+                class="absolute left-5 top-5"
+              />
+            </div>
+
+            <!-- Content -->
+            <div class="flex flex-col justify-center p-8 sm:p-12">
+              <UBadge
+                :label="featuredArticle.category"
+                color="neutral"
+                variant="soft"
+                class="w-fit"
+              />
+
+              <h2
+                class="mt-6 text-3xl font-bold text-highlighted transition group-hover:text-primary sm:text-4xl"
+              >
+                {{ featuredArticle.title }}
+              </h2>
+
+              <p class="mt-5 text-lg leading-8 text-muted">
+                {{ featuredArticle.description }}
+              </p>
+
+              <div
+                class="mt-6 flex flex-wrap items-center gap-3 text-sm text-muted"
+              >
+                <span>
+                  {{ formatDate(featuredArticle.publishedAt) }}
+                </span>
+
+                <span aria-hidden="true">•</span>
+
+                <span> {{ featuredArticle.readingTime }} min read </span>
+              </div>
+
+              <div
+                class="mt-8 flex items-center gap-2 font-semibold text-primary"
+              >
+                Read article
+
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-5 transition group-hover:translate-x-2"
+                />
+              </div>
+            </div>
+          </NuxtLink>
+        </UContainer>
+      </section>
+
+      <!-- Latest articles -->
+      <section class="py-24">
+        <UContainer>
+          <div
+            class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+          >
+            <div>
+              <p class="font-medium text-primary">Latest articles</p>
+
+              <h2
+                class="mt-2 text-3xl font-bold tracking-tight text-highlighted sm:text-4xl"
+              >
+                Learn something new
+              </h2>
+
+              <p class="mt-3 max-w-xl leading-7 text-muted">
+                Tutorials and insights about frontend development, architecture
+                and modern JavaScript frameworks.
+              </p>
+            </div>
+
+            <UButton
+              label="View all articles"
+              to="/articles"
+              color="neutral"
+              variant="outline"
+              trailing-icon="i-lucide-arrow-right"
+            />
+          </div>
+
+          <!-- Categories -->
+          <div class="mt-8 flex flex-wrap gap-2">
+            <UButton
+              v-for="category in categories"
+              :key="category.value"
+              :label="category.label"
+              :icon="category.icon"
+              :color="
+                selectedCategory === category.value ? 'primary' : 'neutral'
+              "
+              :variant="selectedCategory === category.value ? 'soft' : 'ghost'"
+              @click="selectedCategory = category.value"
+            />
+          </div>
+
+          <!-- Article cards -->
+          <div
+            v-if="latestArticles.length"
+            class="mt-10 grid gap-7 md:grid-cols-2 lg:grid-cols-3"
+          >
+            <BlogArticleCard
+              v-for="article in latestArticles"
+              :key="article.path"
+              :article="article"
+            />
+          </div>
+
+          <!-- Empty state -->
+          <div
+            v-else
+            class="mt-10 rounded-3xl border border-dashed border-default px-6 py-16 text-center"
+          >
+            <UIcon name="i-lucide-files" class="mx-auto size-10 text-muted" />
+
+            <h3 class="mt-4 text-xl font-semibold text-highlighted">
+              No articles found
+            </h3>
+
+            <p class="mt-2 text-muted">
+              There are currently no articles in this category.
+            </p>
+
+            <UButton
+              v-if="selectedCategory !== 'all'"
+              label="Show all articles"
+              color="neutral"
+              variant="outline"
+              class="mt-6"
+              @click="selectedCategory = 'all'"
+            />
+          </div>
+        </UContainer>
+      </section>
+    </template>
   </div>
 </template>
