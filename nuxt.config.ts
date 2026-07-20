@@ -1,5 +1,26 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true }
-})
+  compatibilityDate: "2026-07-19",
+  modules: ["@nuxt/ui", "@nuxt/content"],
+
+  css: ["~/assets/css/main.css"],
+
+  devtools: {
+    enabled: true,
+  },
+
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: "en",
+      },
+      title: "Araz Blog",
+      meta: [
+        {
+          name: "description",
+          content:
+            "Frontend development articles about React, Angular, Vue, Nuxt and JavaScript.",
+        },
+      ],
+    },
+  },
+});
