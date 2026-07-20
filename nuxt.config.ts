@@ -1,26 +1,30 @@
 export default defineNuxtConfig({
-  compatibilityDate: "2026-07-19",
+  compatibilityDate: "2026-07-20",
+
   modules: ["@nuxt/ui", "@nuxt/content"],
 
-  css: ["~/assets/css/main.css"],
+  routeRules: {
+    "/": {
+      prerender: true,
+    },
 
-  devtools: {
-    enabled: true,
+    "/articles": {
+      prerender: true,
+    },
+
+    "/articles/**": {
+      prerender: true,
+    },
+
+    "/about": {
+      prerender: true,
+    },
   },
 
-  app: {
-    head: {
-      htmlAttrs: {
-        lang: "en",
-      },
-      title: "Araz Blog",
-      meta: [
-        {
-          name: "description",
-          content:
-            "Frontend development articles about React, Angular, Vue, Nuxt and JavaScript.",
-        },
-      ],
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      failOnError: true,
     },
   },
 });
